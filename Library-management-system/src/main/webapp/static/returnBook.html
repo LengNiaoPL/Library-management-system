@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>还书界面</title>
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .message {
+            margin-top: 20px;
+            color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>还书</h1>
+    <form id="returnBookForm">
+        <div class="form-group">
+            <label for="bookID">书籍ID:</label>
+            <input type="text" id="bookID" name="bookID" required>
+        </div>
+        <div class="form-group">
+            <label for="cardID">学生ID:</label>
+            <input type="text" id="cardID" name="cardID" required readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="reNum">还书数目:</label>
+            <input type="text" id="reNum" name="reNum" required>
+        </div>
+
+        <div class="form-group">
+            <label for="returnDate">还书日期:</label>
+            <input type="date" id="returnDate" name="returnDate" required readonly>
+        </div>
+        <button type="submit">提交还书</button>
+    </form>
+    <div id="message" class="message"></div>
+</div>
+
+
+<script src="../js/getCookie.js"></script>
+<script>
+    document.getElementById('returnBookForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+
+        // 获取表单元素
+        const form = document.getElementById('returnBookForm');
+        const formData = new FormData(form);
+
+        const jsonData = {};
+        for (let [key, value] of formData.entries()) {
+            //将值转换为字符串
+            jsonData[key] = value;
+        }
+
+        // 配置fetch请求
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(jsonData)
+        };
+
+
+        //表单提交
+        fetch('../record/return',options)
+            .then(response => response.json())
+            .then(data =>{
+
+                if (data.data=="Login"){
+                    alert('请先登入');
+                    window.location.assign( "/static/Login.html")
+                }
+
+                alert(data.data)
+                console.log(data)
+
+            })
+            .catch(error => {
+                // 处理请求错误
+                console.error('Error:', error);
+                alert("信息有误");
+
+            });
+
+    });
+
+
+    // 页面加载完成后执行
+    window.onload = function() {
+        // 尝试从cookie中获取'username'的值
+        var username = getCookie("userName") || '未登入';
+        // 如果cookie存在，则将其值设置为input的值
+        if (username) {
+            document.getElementById('cardID').value = username;
+        }
+
+        // 获取当前日期
+        var currentDate = new Date();
+        // 将日期格式化为 YYYY-MM-DD
+        var formattedDate = currentDate.toISOString().split('T')[0];
+        // 设置 input 的值为当前日期
+        document.getElementById('returnDate').value = formattedDate;
+    };
+</script>
+</body>
+</html>

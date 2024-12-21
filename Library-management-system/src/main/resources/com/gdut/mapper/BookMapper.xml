@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace等于mapper接口类的全限定名,这样实现对应 -->
+
+<mapper namespace="com.gdut.mapper.BookMapper">
+
+
+    <select id="findByBookID" resultType="book">
+           select bookID,title,author,publisher,publicationDate,classificationID,quantity from books where bookID=#{bookID}
+    </select>
+
+
+    <select id="findByTitle" resultType="book">
+        select bookID,title,author,publisher,publicationDate,classificationID,quantity from books where title=#{title}
+    </select>
+
+
+    <insert id="addBook">
+        insert into books(BookID,Title,Author,Publisher,PublicationDate,ClassificationID,Quantity)
+        values (#{BookID},#{Title},#{Author},#{Publisher},#{PublicationDate},#{ClassificationID},#{Quantity})
+    </insert>
+
+
+    <update id="borrowBook">
+        update books set quantity = quantity - #{num} where bookID=#{bookID};
+    </update>
+
+
+    <update id="returnBook">
+        update books set quantity = quantity + #{reNum} where bookID=#{bookID};
+    </update>
+
+
+
+
+</mapper>

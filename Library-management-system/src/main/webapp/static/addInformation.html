@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>完善信息</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .form-group button:hover {
+            background-color: #4cae4c;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h2>完善个人信息</h2>
+    <form id="borrowForm">
+
+        <div class="form-group">
+            <label for="cardID">卡号</label>
+            <input type="text" id="cardID" name="cardID" required>
+        </div>
+
+        <div class="form-group">
+            <label for="name">姓名</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="user-gender">请选择您的性别：</label>
+            <select name="gender" id="user-gender">
+                <option value='男'>男</option>
+                <option value='女' selected>女</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="unit">学院</label>
+            <input type="text" id="unit" name="unit" required>
+        </div>
+
+
+
+        <div class="form-group">
+            <label for="phone">电话</label>
+            <input type="text" id="phone" name="phone" required>
+        </div>
+
+
+        <div class="form-group">
+            <label for="registerDate">注册日期</label>
+            <input type="date" id="registerDate" name="registerDate" required readonly>
+        </div>
+
+
+
+        <div class="form-group">
+            <button type="submit">提交信息</button>
+        </div>
+    </form>
+</div>
+
+<script src="../js/getCookie.js"></script>
+<script>
+    document.getElementById('borrowForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+
+        const form = document.getElementById('borrowForm');
+        const formData = new FormData(form);
+
+        const jsonData = {};
+        for (let [key, value] of formData.entries()) {
+            jsonData[key] = value;
+        }
+
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(jsonData)
+        };
+
+
+        //表单提交
+        fetch('../card/add',options)
+            .then(response => response.json())
+            .then(data =>{
+
+                alert(data.data)
+                if(data.data==="添加成功"){
+                    alert("去登录")
+                    window.location.assign( "/static/Login.html")
+                }
+
+            })
+            .catch(error => {
+                // 处理请求错误
+                console.error('Error:', error);
+                alert("信息有误");
+
+            });
+
+    });
+
+
+    window.onload = function() {
+        var currentDate = new Date();
+        var formattedDate = currentDate.toISOString().split('T')[0];
+        document.getElementById('registerDate').value = formattedDate;
+
+    };
+
+
+
+</script>
+</body>
+</html>

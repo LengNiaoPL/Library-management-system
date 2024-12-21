@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace等于mapper接口类的全限定名,这样实现对应 -->
+
+<mapper namespace="com.gdut.mapper.RecordMapper">
+        <insert id="addRecord">
+            insert into records values (#{bookID},#{cardID},#{borrowDate},default,#{shouldBeReturnDate},#{num},default);
+        </insert>
+
+        <update id="addBackTime">
+            update records set returnDate=#{returnDate},reNum=reNum+#{reNum} where bookID=#{bookID} and cardID=#{cardID} and num>reNum;
+        </update>
+
+    <!--我开了自动映射,所以只需要些主键-->
+    <resultMap id="findRecordMap" type="record">
+        <id column="bookID" property="bookID"/>
+        <id column="cardID" property="cardID"/>
+
+        <association property="card" javaType="card">
+            <id column="cardID" property="cardID"/>
+        </association>
+
+        <association property="book" javaType="book">
+            <id column="bookID" property="bookID"/>
+        </association>
+    </resultMap>
+
+    
+    <select id="findByID" resultMap="findRecordMap">
+        select records.bookID as bookID,records.cardID as cardID,borrowDate,
+        returnDate,shouldBeReturnDate,title,num,reNum
+        from records,books where records.cardID=#{cardID} and records.bookID=books.bookID
+    </select>
+
+
+    <select id="findAll" resultMap="findRecordMap">
+        select records.BookID as BookID,records.CardID as CardID,BorrowDate,ReturnDate,Title,Author,Publisher,PublicationDate,
+        ClassificationID,Quantity,Name,Phone,RegisterDate
+        from records,books,cards where records.CardID=cards.CardID and records.BookID=books.BookID
+    </select>
+
+
+
+</mapper>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图书管理系统 - 借书记录</title>
+    <style>
+        /* 基本样式 */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        /* 表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        /* 分页控件样式 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pagination button {
+            margin: 0 5px;
+            padding: 5px 10px;
+        }
+        #error-message {
+            color: red;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        #loading {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>借书记录</h1>
+    <div id="error-message"></div>
+    <div id="loading" style="display: none;">加载中...</div>
+    <table id="recordsTable">
+        <thead>
+        <tr>
+            <th>书号</th>
+            <th>书名</th>
+            <th>借书证号</th>
+            <th>借书日期</th>
+            <th>还书日期</th>
+            <th>应还日期</th>
+            <th>借书数量</th>
+            <th>已还数量</th>
+        </tr>
+        </thead>
+        <tbody id="recordsBody">
+        <!-- 记录将在这里动态插入 -->
+        </tbody>
+    </table>
+    <div class="pagination">
+        <button id="prevPage">上一页</button>
+        <span id="currentPage">1</span> / <span id="totalPages">1</span>
+        <button id="nextPage">下一页</button>
+    </div>
+</div>
+
+<script src="../js/getCookie.js"></script>
+<script>
+    // 全局变量
+    let currentPage = 1;
+    const pageSize = 5; // 每页显示的记录数
+
+    // 获取DOM元素
+    const recordsBody = document.getElementById('recordsBody');
+    const prevPageBtn = document.getElementById('prevPage');
+    const nextPageBtn = document.getElementById('nextPage');
+    const currentPageSpan = document.getElementById('currentPage');
+    const totalPagesSpan = document.getElementById('totalPages');
+    const errorMessage = document.getElementById('error-message');
+    const loadingElement = document.getElementById('loading');
+
+    // 从服务器获取数据的函数
+    async function fetchRecords(page, size) {
+        loadingElement.style.display = 'block';
+        errorMessage.textContent = '';
+
+        try {
+            const userName=getCookie('userName')
+            const apiUrl = '../record/stufind';
+            const response = await fetch(`${apiUrl}?cardID=${userName}&page=${page}&pageSize=${size}`);
+
+            if (!response.ok) {
+                throw new Error('网络响应不正常');
+            }
+
+
+            const data = await response.json();
+
+            if (data.data=="Login"){
+                alert('请先登入');
+                window.location.assign( "/static/Login.html")
+            }
+
+            return data;
+        } catch (error) {
+            console.error('获取记录时出错:', error);
+            throw error;
+        } finally {
+            loadingElement.style.display = 'none';
+        }
+    }
+
+    // 显示记录的函数
+    function displayRecords(records) {
+        recordsBody.innerHTML = '';
+        records.forEach(record => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                    <td>${record.bookID}</td>
+                    <td>${record.book.title}</td>
+                    <td>${record.cardID}</td>
+                    <td>${record.borrowDate}</td>
+                    <td>${record.returnDate}</td>
+                    <td>${record.shouldBeReturnDate}</td>
+                    <td>${record.num}</td>
+                    <td>${record.reNum}</td>
+                `;
+            recordsBody.appendChild(row);
+        });
+    }
+
+    // 更新分页信息的函数
+    function updatePagination(currentPage, totalItems, pageSize) {
+        const totalPages = Math.ceil(totalItems / pageSize);
+        currentPageSpan.textContent = currentPage;
+        totalPagesSpan.textContent = totalPages;
+        prevPageBtn.disabled = currentPage === 1;
+        nextPageBtn.disabled = currentPage === totalPages;
+    }
+
+    // 加载记录的函数
+    async function loadRecords() {
+        try {
+            const data = await fetchRecords(currentPage, pageSize);
+            displayRecords(data.data);
+            updatePagination(data.currentPage, data.total, data.pageSize);
+        } catch (error) {
+            errorMessage.textContent = '获取记录时出错: ' + error.message;
+        }
+    }
+
+    // 上一页按钮点击事件
+    prevPageBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            loadRecords();
+        }
+    });
+
+    // 下一页按钮点击事件
+    nextPageBtn.addEventListener('click', () => {
+        currentPage++;
+        loadRecords();
+    });
+
+    // 初始化加载第一页记录
+    loadRecords();
+</script>
+</body>
+</html>

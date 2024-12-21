@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人信息查看</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        .info-container {
+            margin-top: 20px;
+        }
+        p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>个人信息</h1>
+    <div class="info-container">
+        <p><strong>卡号:</strong> <span id="cardNumber"></span></p>
+        <p><strong>名字:</strong> <span id="name"></span></p>
+        <p><strong>手机号:</strong> <span id="phoneNumber"></span></p>
+        <p><strong>注册日期:</strong> <span id="registrationDate"></span></p>
+        <p><strong>性别:</strong> <span id="gender"></span></p>
+        <p><strong>学院:</strong> <span id="college"></span></p>
+        <p><strong>状态:</strong> <span id="status"></span></p>
+    </div>
+</div>
+
+<script src="../js/getCookie.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const cardID=getCookie('userName')
+
+        fetch( `../card/select?cardID=${cardID}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络响应失败');
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('cardNumber').innerText = data.cardID;
+                document.getElementById('name').innerText = data.name;
+                document.getElementById('phoneNumber').innerText = data.phone;
+                document.getElementById('registrationDate').innerText = data.registerDate;
+                document.getElementById('gender').innerText = data.gender;
+                document.getElementById('college').innerText = data.unit;
+                document.getElementById('status').innerText = data.state;
+            })
+            .catch(error => {
+                console.error('请求失败:', error);
+                alert('无法加载个人信息，请稍后再试。');
+            });
+    });
+</script>
+</body>
+</html>

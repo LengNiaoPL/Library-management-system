@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图书管理系统 - 查询书籍</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .result-group {
+            margin-top: 20px;
+        }
+        .result-group div {
+            margin-bottom: 10px;
+        }
+        .result-group label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>查询书籍</h1>
+    <div class="form-group">
+        <label for="bookId">编号:</label>
+        <input type="text" id="bookId" name="bookId">
+    </div>
+    <div class="form-group">
+        <label for="bookName">书名:</label>
+        <input type="text" id="bookName" name="bookName">
+    </div>
+    <button onclick="queryById()">编号查询</button>
+    <button onclick="queryByName()">书名查询</button>
+    <button onclick="clearAllTextBoxes()">清空</button>
+
+    <div class="result-group">
+        <div>
+            <label>作者:</label>
+            <span id="Author"></span>
+        </div>
+        <div>
+            <label>出版社:</label>
+            <span id="Publisher"></span>
+        </div>
+        <div>
+            <label>出版日期:</label>
+            <span id="PublishDate"></span>
+        </div>
+        <div>
+            <label>类型:</label>
+            <span id="ClassificationName"></span>
+        </div>
+        <div>
+            <label>存放位置:</label>
+            <span id="Address"></span>
+        </div>
+        <div>
+            <label>存量:</label>
+            <span id="Quantity"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function queryById() {
+        const bookId = document.getElementById('bookId').value;
+        fetchBookData(`?BookID=${bookId}`);
+    }
+
+    function queryByName() {
+        const bookName = document.getElementById('bookName').value;
+        fetchBookData(`?BookName=${bookName}`);
+    }
+
+
+    function fetchBookData(queryString) {
+        const url = `../book/find${queryString}`;// 后端API端点
+             fetch(url)
+                 .then(response => {
+
+                     return response.json();
+                 })
+                 .then(data => {
+
+                     if (data.data=="Login"){
+                         alert('请先登入');
+                         window.location.assign( "/static/Login.html")
+                     }
+                 document.getElementById('bookId').value = data.data.bookID || '未知';
+                 document.getElementById('bookName').value = data.data.title || '未知';
+                 document.getElementById('Author').textContent = data.data.author || '未知';
+                 document.getElementById('Publisher').textContent = data.data.publisher || '未知';
+                 document.getElementById('PublishDate').textContent = data.data.publicationDate || '未知';
+                 document.getElementById('ClassificationName').textContent = data.data.classification.classificationName || '未知';
+                 document.getElementById('Address').textContent = data.data.classification.address || '未知';
+                 document.getElementById('Quantity').textContent = data.data.quantity || '未知';
+            })
+            .catch(error => {
+                console.error('Error fetching book data:', error);
+                alert('查询失败，请稍后重试。');
+            });
+    }
+
+
+    function clearAllTextBoxes() {//清空的脚本
+        // 获取所有文本框元素
+        const formTexts = document.querySelectorAll('.form-group input[type="text"]');
+        // 遍历每个文本框并清空其内容
+        formTexts.forEach(function(formText) {
+            formText.value = '';
+        });
+
+        var resultGroup = document.querySelector('.result-group');
+        var spans = resultGroup.getElementsByTagName('span');
+        for (var i = 0; i < spans.length; i++) {
+            spans[i].textContent = '';
+        }
+    }
+
+
+</script>
+
+
+
+
+</body>
+</html>

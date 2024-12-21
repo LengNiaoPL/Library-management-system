@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+
+        .ht{
+            text-align: center;
+            color: cadetblue;
+            font-family: 幼圆;
+        }
+        .tab{
+            width: 500px;
+            border: 5px solid cadetblue;
+            margin: 0px auto;
+            border-radius: 5px;
+            font-family: 幼圆;
+        }
+        .ltr td{
+            border: 1px solid  powderblue;
+
+        }
+        .ipt{
+            border: 0px;
+            width: 50%;
+
+        }
+        .btn1{
+            border: 2px solid powderblue;
+            border-radius: 4px;
+            width:60px;
+            background-color: antiquewhite;
+
+        }
+        #usernameMsg , #userPwdMsg {
+            color: rgb(230, 87, 51);
+        }
+
+        .buttonContainer{
+            text-align: center;
+        }
+    </style>
+    <script>
+        // 检验用户名格式是否合法的函数
+        function checkUsername(){
+            // 定义正则表示字符串的规则
+            var  usernameReg= /^\d{10}$/
+            // 获得用户在页面上输入的信息
+            var usernameInput =document.getElementById("usernameInput")
+            var username = usernameInput.value
+            // 获得格式提示的框
+            var usernameMsg =document.getElementById("usernameMsg")
+            // 格式有误时,返回false,在页面上提示
+            if(!usernameReg.test(username)){
+                usernameMsg.innerText="用户名格式有误"
+                return false
+            }
+            // 格式OK,返回true 在页面上提示OK
+            usernameMsg.innerText="OK"
+            return true
+
+        }
+
+        // 检验密码格式是否合法的函数
+        function checkUserPwd(){
+            // 定义正则表示字符串的规则
+            var  userPwdReg= /^[a-zA-Z0-9]{8,15}$/
+            // 获得用户在页面上输入的信息
+            var userPwdInput =document.getElementById("userPwdInput")
+            var userPwd = userPwdInput.value
+            // 获得格式提示的框
+            var userPwdMsg =document.getElementById("userPwdMsg")
+            // 格式有误时,返回false,在页面上提示
+            if(!userPwdReg.test(userPwd)){
+                userPwdMsg.innerText="密码格式错误"
+                return false
+            }
+            // 格式OK,返回true 在页面上提示OK
+            userPwdMsg.innerText="OK"
+            return true
+
+        }
+
+        // 表单在提交时,校验用户名和密码格式,格式OK才会提交
+        function checkForm(){
+            var flag1 =checkUsername()
+            var flag2 =checkUserPwd()
+
+            return flag1&&flag2
+        }
+
+
+    </script>
+
+
+    <script>
+        /**
+         * 提交表单数据到后端服务器
+         */
+        function submitForm() {
+            // 阻止表单的默认提交行为
+            event.preventDefault();
+
+            // 获取表单元素
+            const form = document.getElementById('loginForm');
+
+
+            // 创建一个FormData对象来收集表单数据
+            const formData = new FormData(form);
+
+            // 将FormData对象转换为JSON对象
+            // 注意：FormData没有直接转换为JSON的方法，这里需要手动转换
+            // 我们只转换那些我们知道是字符串或数字的字段
+            const jsonData = {};
+            for (let [key, value] of formData.entries()) {
+                // 这里简单处理，将值转换为字符串（如果它是File或Blob，可能需要特殊处理）
+                jsonData[key] = value;
+            }
+
+            // 配置fetch请求
+            const options = {
+                method: 'POST', // 或 'PUT'
+                headers: {
+                    'Content-Type': 'application/json',
+                    // 注意：这里虽然设置为JSON，但我们通常使用'multipart/form-data'发送FormData
+                    // 如果发送JSON，则不需要FormData，直接发送jsonData
+                    // 如果发送FormData，则不需要设置Content-Type，浏览器会自动设置
+                },
+                body: JSON.stringify(jsonData) // 如果决定发送JSON，则这样做
+                // 如果发送FormData，则不需要body: JSON.stringify(jsonData)
+            };
+
+
+            // 使用fetch发送请求      //此处省略笔记1
+            fetch('../user/login', options)
+                .then(response => response.json())
+                .then(data => {
+                    // 处理获取到的数据
+                    console.log(data);
+                    let ReAddress=data.data
+                    window.location.assign(ReAddress);
+                })
+                .catch(error => {
+                    // 处理请求错误
+                    console.error('Error:', error);
+                    alert("信息有误");
+
+                });
+        }
+
+
+
+
+
+    </script>
+
+
+
+</head>
+<body>
+<h1 class="ht">欢迎使用图书管理系统</h1>
+<h3 class="ht">请登录</h3>
+
+<form id="loginForm" onsubmit="return checkForm()">
+    <table class="tab" cellspacing="0px">
+        <tr class="ltr">
+            <td>请输入学号</td>
+            <td>
+                <input class="ipt" type="text" id="usernameInput" name="userName" onblur="checkUsername()">
+                <span id="usernameMsg"></span>
+            </td>
+        </tr>
+        <tr class="ltr">
+            <td>请输入密码</td>
+            <td>
+                <input class="ipt" type="password" id="userPwdInput"  name="passWord" onblur="checkUserPwd()">
+                <span id="userPwdMsg"></span>
+            </td>
+        </tr>
+
+
+        <tr class="ltr"></tr>
+        <td>
+            <label for="user-role">请选择您的身份：</label>
+            <select name="ofManager" id="user-role">
+                <option value=true>管理员</option>
+                <option value=false selected>学生</option>
+            </select>
+        </td>
+        </tr>
+
+
+        <tr class="ltr">
+            <td colspan="2" class="buttonContainer">
+                <input class="btn1" type=button onclick="submitForm(this.form)" value="登录">
+                <input class="btn1" type="reset" value="重置">
+                <button class="btn1"><a href="Regist.html">去注册</a></button>
+            </td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

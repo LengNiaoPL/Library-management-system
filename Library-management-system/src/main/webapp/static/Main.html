@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图书管理系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            color: white;
+            background-color: #4CAF50;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>图书管理系统</h2>
+    <button class="button" onclick="redirectToPage('borrow')" >借书</button>
+    <button class="button" onclick="redirectToPage('returnBook')">还书</button>
+    <button class="button" onclick="redirectToPage('FindBook')">查找书籍</button>
+    <button class="button" onclick="redirectToPage('record')">我的借书记录</button>
+    <button class="button" onclick="redirectToPage('information')">个人信息</button>
+</div>
+
+
+<script>
+    //跳转页面的函数,传入要跳转html的名字
+    function redirectToPage(pageName) {
+        window.location.href = pageName + '.html';
+    }
+</script>
+
+
+</body>
+</html>

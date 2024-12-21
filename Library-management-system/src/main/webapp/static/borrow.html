@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>借书中</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .form-group button:hover {
+            background-color: #4cae4c;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h2>借书信息</h2>
+    <form id="borrowForm">
+        <div class="form-group">
+            <label for="bookID">书籍编号</label>
+            <input type="text" id="bookID" name="bookID" required>
+        </div>
+        <div class="form-group">
+            <label for="cardID">卡号</label>
+            <input type="text" id="cardID" name="cardID" required readonly>
+        </div>
+        <div class="form-group">
+            <label for="num">书籍数量</label>
+            <input type="text" id="num" name="num" required>
+        </div>
+        <div class="form-group">
+            <label for="borrowDate">借书日期</label>
+            <input type="date" id="borrowDate" name="borrowDate" required readonly>
+        </div>
+        <div class="form-group">
+            <label for="shouldBeReturnDate">预计还书日期(30天内)</label>
+            <input type="date" id="shouldBeReturnDate" name="shouldBeReturnDate" required>
+        </div>
+        <div class="form-group">
+            <button type="submit">提交借书请求</button>
+        </div>
+    </form>
+</div>
+
+<script src="../js/getCookie.js"></script>
+<script>
+    document.getElementById('borrowForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+
+        // 获取表单元素
+        const form = document.getElementById('borrowForm');
+        const formData = new FormData(form);
+
+        const jsonData = {};
+        for (let [key, value] of formData.entries()) {
+            //将值转换为字符串
+            jsonData[key] = value;
+        }
+
+        // 配置fetch请求
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(jsonData)
+        };
+
+
+        //表单提交
+         fetch('../record/add',options)
+             .then(response => response.json())
+             .then(data =>{
+
+                 if (data.data=="Login"){
+                     alert('请先登入');
+                     window.location.assign( "/static/Login.html")
+                 }
+                 alert(data.data)
+                 console.log(data)
+
+             })
+             .catch(error => {
+                 // 处理请求错误
+                 console.error('Error:', error);
+                 alert("信息有误");
+
+             });
+
+    });
+
+
+    // 页面加载完成后执行
+    window.onload = function() {
+        // 尝试从cookie中获取'username'的值
+        var username = getCookie("userName") || '未登入';
+        // 如果cookie存在，则将其值设置为input的值
+        if (username) {
+            document.getElementById('cardID').value = username;
+        }
+
+        // 获取当前日期
+        var currentDate = new Date();
+        // 将日期格式化为 YYYY-MM-DD
+        var formattedDate = currentDate.toISOString().split('T')[0];
+        // 设置 input 的值为当前日期
+        document.getElementById('borrowDate').value = formattedDate;
+
+
+
+        var thirtyDaysLater = new Date(currentDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+        // 将日期格式化为 YYYY-MM-DD
+        var ReDate = thirtyDaysLater.toISOString().split('T')[0];
+        // 设置 input 的最大日期为30天后
+        var returnDateInput = document.getElementById('shouldBeReturnDate');
+        returnDateInput.setAttribute('min',formattedDate );
+        returnDateInput.setAttribute('max',ReDate);
+
+
+
+
+    };
+
+
+
+</script>
+</body>
+</html>
